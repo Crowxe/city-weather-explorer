@@ -1,33 +1,24 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { fetchCities } from './services/cityService';
+import CityCarousel from './components/CityCarousel';
+import './App.css'
 
-export const App = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+const App = () => {
   const [cities, setCities] = useState([]);
 
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8081/topCities/search?query=${searchTerm}`);
-      setCities(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const getCities = async () => {
+      const citiesData = await fetchCities();
+      setCities(citiesData);
+    };
+
+    getCities();
+  }, []);
 
   return (
-    <div>
-      <h1>City Weather Explorer</h1>
-      <div>
-        <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-        <button onClick={handleSearch}>Search</button>
-      </div>
-      <ul>
-        {cities.map(city => (
-          <li key={city.id}>
-            {city.localizedName} - {city.temperatureValue} {city.temperatureUnit} - {city.weatherText}
-          </li>
-        ))}
-      </ul>
+    <div className="app">
+      <h1>Top 150 Cities</h1>
+      <CityCarousel cities={cities} />
     </div>
   );
 };
